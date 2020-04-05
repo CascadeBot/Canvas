@@ -8,7 +8,8 @@ edition = "2018"
 
 [dependencies]
 imageproc="0.20.0"
-image="0.23.2"
+image="0.23.3"
 png="0.16.2"
 rocket = "0.4.4"
 zerocopy = "0.3.0"
+rusttype = "0.8.2"
