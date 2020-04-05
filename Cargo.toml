@@ -1,0 +1,14 @@
+[package]
+name = "canvas"
+version = "0.1.0"
+authors = ["William Oldham <wegg7250@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+imageproc="0.20.0"
+image="0.23.2"
+png="0.16.2"
+rocket = "0.4.4"
+zerocopy = "0.3.0"
