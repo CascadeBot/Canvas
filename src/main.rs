@@ -2,6 +2,7 @@
 
 #[macro_use] extern crate rocket;
 
+use rocket::http::RawStr;
 use rocket::response::Content;
 use rocket::http::ContentType;
 use std::io::Read;
@@ -19,19 +20,19 @@ use imageproc::rect::Rect;
 use image::Rgba;
 
 fn main() {
-    rocket::ignite().mount("/test.png", routes![get_image]).launch();
+    rocket::ignite().mount("/", routes![get_image]).launch();
 }
 
-#[get("/")]
-fn get_image() -> Content<Vec<u8>> {
+#[get("/<file_name>")]
+fn get_image(file_name: &RawStr) -> Content<Vec<u8>> {
 
 
-    let decoder = PngDecoder::new(File::open("bg.png").unwrap()).unwrap();
+    let decoder = PngDecoder::new(File::open(file_name.as_str()).unwrap()).unwrap();
 
     let width = decoder.dimensions().0;
     let height = decoder.dimensions().1;
 
-    let data = read_8bit_image(decoder);
+    let data = read_8bit_image(decoder).expect("could not decode image");
 
     let mut base_image = Blend(RgbaImage::from_raw(width, height, data).unwrap());
 
@@ -62,14 +63,14 @@ fn get_image() -> Content<Vec<u8>> {
 
 fn read_8bit_image<T : Read>(decoder: PngDecoder<T>) -> Result<Vec<u8>, &'static str>  {
     if decoder.color_type() != ColorType::Rgba8 {
-        Err("The image must be a 8-bit RGB image with an alpha channel")
+        Err("the image must be a 8-bit RGB image with an alpha channel")
     } else {
-        if let Ok(numBytes) = decoder.total_bytes().try_into() {
-            let mut buf: Vec<u8> = vec![0; numBytes];
-            decoder.read_image(buf.as_bytes_mut()).expect("Could not read image into buffer");
+        if let Ok(num_bytes) = decoder.total_bytes().try_into() {
+            let mut buf: Vec<u8> = vec![0; num_bytes];
+            decoder.read_image(buf.as_bytes_mut()).expect("could not read image into buffer");
             Ok(buf)
         } else {
-            Err("Could not convert total bytes to usize")
+            Err("could not convert total bytes to usize")
         }
     }
 }
